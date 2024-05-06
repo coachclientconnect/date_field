@@ -39,6 +39,7 @@ class DateTimeFormField extends FormField<DateTime> {
     DateTime? firstDate,
     DateTime? lastDate,
     DateTimeFieldPickerMode mode = DateTimeFieldPickerMode.dateAndTime,
+    DateTimeFieldPickerStyle pickerStyle = DateTimeFieldPickerStyle.auto,
   }) : super(
           enabled: decoration?.enabled ?? true,
           builder: (FormFieldState<DateTime> field) {
@@ -82,6 +83,7 @@ class DateTimeFormField extends FormField<DateTime> {
                     lastDate: lastDate,
                     dateFormat: dateFormat,
                     mode: mode,
+                    pickerStyle: pickerStyle,
                     hideDefaultSuffixIcon: hideDefaultSuffixIcon,
                     cupertinoDatePickerOptions: cupertinoDatePickerOptions,
                     materialDatePickerOptions: materialDatePickerOptions,

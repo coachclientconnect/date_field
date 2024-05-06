@@ -41,6 +41,12 @@ enum DateTimeFieldPickerMode {
       };
 }
 
+enum DateTimeFieldPickerStyle {
+  auto,
+  cupertino,
+  material,
+}
+
 /// [DateTimeField]
 ///
 /// Shows an [_InputDropdown] that'll trigger [DateTimeField._handleTap] whenever the user
@@ -63,6 +69,7 @@ class DateTimeField extends StatefulWidget {
     this.materialDatePickerOptions = const MaterialDatePickerOptions(),
     this.materialTimePickerOptions = const MaterialTimePickerOptions(),
     this.mode = DateTimeFieldPickerMode.dateAndTime,
+    this.pickerStyle = DateTimeFieldPickerStyle.auto,
     DateTime? firstDate,
     DateTime? lastDate,
     DateFormat? dateFormat,
@@ -123,6 +130,7 @@ class DateTimeField extends StatefulWidget {
     this.padding,
     this.decoration,
     this.mode = DateTimeFieldPickerMode.dateAndTime,
+    this.pickerStyle = DateTimeFieldPickerStyle.auto,
     this.initialPickerDateTime,
     DateTime? firstDate,
     DateTime? lastDate,
@@ -215,6 +223,8 @@ class DateTimeField extends StatefulWidget {
   ///   [CupertinoDatePickerMode].
   /// - Else => a [MaterialDatePicker], a [MaterialTimePicker] or both.
   final DateTimeFieldPickerMode mode;
+
+  final DateTimeFieldPickerStyle pickerStyle;
 
   @override
   State<DateTimeField> createState() => DateTimeFieldState();
@@ -350,9 +360,21 @@ class DateTimeFieldState extends State<DateTimeField> {
 
     widget.onTap?.call();
 
-    final TargetPlatform platform = Theme.of(context).platform;
+    // determine the picker style to use. if auto, resolve
+    // to cupertino to material depending on target platform
+    DateTimeFieldPickerStyle pickerStyle = widget.pickerStyle;
+    if (pickerStyle == DateTimeFieldPickerStyle.auto) {
+      final TargetPlatform platform = Theme.of(context).platform;
+      if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+        pickerStyle = DateTimeFieldPickerStyle.cupertino;
+      } else {
+        pickerStyle = DateTimeFieldPickerStyle.material;
+      }
+    }
 
-    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+    // if cupertino, show that picker
+    if (pickerStyle == DateTimeFieldPickerStyle.cupertino) {
+      // if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
       final DateTime? newDateTime = await _showCupertinoPicker();
       _isSelecting = false;
 
@@ -364,6 +386,7 @@ class DateTimeFieldState extends State<DateTimeField> {
       return newDateTime;
     }
 
+    // proceed to show the material picker
     DateTime? selectedDateTime = _initialPickerDateTime;
 
     if (widget.mode == DateTimeFieldPickerMode.dateAndTime ||
